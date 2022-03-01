@@ -1,21 +1,19 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CellComponent : MonoBehaviour
+public class CellComponent : MiniCell
 {
     [SerializeField] private ItemOutline _outline;
-    private Cell _cell;
+  
 
-    public Action<Vector3, int> onSelect;
+    public Action<Cell> onSelect;
 
     public int ID => _cell.ID;
     public Vector3 Position => _cell.Position;
     public bool IsEmpty => _cell.IsEmpty;
     private void OnMouseDown()
     {
-        onSelect?.Invoke(transform.position, _cell.ID);
+        onSelect?.Invoke(_cell);
         _outline.gameObject.SetActive(false);
     }
 
@@ -25,11 +23,12 @@ public class CellComponent : MonoBehaviour
         _outline.gameObject.SetActive(true);
     }
 
-    public void Init(Vector3 position, int id, bool isEmpty)
+    public void Disactive() 
     {
-        _cell = new Cell(position, id, isEmpty);
-        transform.position = position;        
+        _outline.gameObject.SetActive(false);
     }
+
+    
 
     private void OnTriggerEnter(Collider other)
     {

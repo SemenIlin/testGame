@@ -15,9 +15,9 @@ public class Parser
     private int _amountConnections;
     private (int, int)[] _pairConnections;
 
-    public void OnParse()
+    public void OnParse(string fileName = "data")
     {
-        var path = Application.streamingAssetsPath + "/data.txt";
+        var path = Application.streamingAssetsPath + "/" + fileName + ".txt";
         
         try
         {
@@ -38,14 +38,14 @@ public class Parser
             _startNumbers = new int[_amountChips];
             for (int i = 0; i < _amountChips; i++)
             {
-                _startNumbers[i] = int.Parse(startPositions[i]);
+                _startNumbers[i] = int.Parse(startPositions[i]) - 1;
             }
 
             var winPositions = dataFromFile[2 + _amountCells + 1].Split(',');
             _winNumbers = new int[_amountChips];
             for (int i = 0; i < _amountChips; i++)
             {
-                _winNumbers[i] = int.Parse(winPositions[i]);
+                _winNumbers[i] = int.Parse(winPositions[i]) - 1;
             }
 
             _amountConnections = int.Parse(dataFromFile[2 + _amountCells + 2]);
@@ -53,7 +53,7 @@ public class Parser
             for (int i = 2 + _amountCells + 3, j = 0; i < 2 + _amountCells + 3 + _amountConnections; i++, j++)
             {
                 var temp = dataFromFile[i].Split(',');
-                _pairConnections[j] = (int.Parse(temp[0]), int.Parse(temp[1]));
+                _pairConnections[j] = (int.Parse(temp[0]) - 1, int.Parse(temp[1]) - 1);
             }
 
         }

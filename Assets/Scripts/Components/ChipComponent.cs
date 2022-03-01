@@ -5,16 +5,15 @@ using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(BoxCollider))]
-public class ChipComponent : MonoBehaviour
+public class ChipComponent : MiniChip
 {
     [SerializeField, Range(0.2f, 3)] private float _duration = 1f;
     [SerializeField] private ItemOutline _outline;
-
-    private Chip _chip;
-    private MeshRenderer _meshRenderer;
+    
     private BoxCollider _collider;
 
-    public Action<Chip> onSelect;
+    public Action<ChipComponent> onSelect;
+    public Action Finish;
 
     private int _numberCell;
 
@@ -23,14 +22,10 @@ public class ChipComponent : MonoBehaviour
         _meshRenderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<BoxCollider>();
     }
-    private void SetColor(Color color)
-    {
-        _meshRenderer.material.color = color;
-    }
 
     private void OnMouseDown()
     {
-        onSelect?.Invoke(_chip);
+        onSelect?.Invoke(this);
         _chip.IsSelect = true;
         _outline.gameObject.SetActive(true);
     }
@@ -46,6 +41,12 @@ public class ChipComponent : MonoBehaviour
     public int NumberCell => _numberCell;
 
     public int ID => _chip.ID;
+
+    public bool IsMove => _chip.IsMove;
+    public void Active()
+    {
+        _chip.IsSelect = true;
+    }
     public void Disactive()
     {
         _chip.IsSelect = false;
@@ -55,6 +56,11 @@ public class ChipComponent : MonoBehaviour
     public void DisableCollider()
     {
         _collider.enabled = false;
+    }
+
+    public void EnableCollider()
+    {
+        _collider.enabled = true;
     }
     public void Init(Vector3 position, int id, bool isSelect, Color color)
     {
@@ -70,10 +76,15 @@ public class ChipComponent : MonoBehaviour
         {
             siquence.Append(transform.DOMove(endPositions[i], _duration));
         }
-        siquence.Append(transform.DOMove(endPositions[endPositions.Count - 1], _duration).OnComplete(()=> 
+        if (endPositions.Count > 0)
         {
-            _chip.IsMove = false;
-            _collider.enabled = true;
-        }));
+            siquence.Append(transform.DOMove(endPositions[endPositions.Count - 1], _duration).OnComplete(() =>
+            {
+                _chip.IsMove = false;
+                _outline.gameObject.SetActive(false);                
+
+                Finish?.Invoke();
+            }));
+        }
     }
 }

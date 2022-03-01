@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FinderPath 
 {
-    private float?[,] matrix;
+    private float [,] matrix;
     private float[] minDistance;
     private int[] visitetVertex;
     int minIndex = int.MaxValue;
@@ -13,14 +13,14 @@ public class FinderPath
     public List<int> FindPath(int selectedChip, int selectedCell, int amountCells, (int,int)[] connections, List<CellComponent> cells)
     {
         var stepsOfPath = new List<int>();
-        matrix = new float?[amountCells, amountCells];
+        matrix = new float[amountCells, amountCells];
         minDistance = new float[amountCells];
         visitetVertex = new int[amountCells];
 
         OnNullMatrix(amountCells);
         FillDataMatrix(selectedChip, connections, cells);
         
-        var begin_index = 0;
+        var begin_index = selectedChip;
         for (int i = 0; i < amountCells; i++)
         {
             minDistance[i] = float.MaxValue;
@@ -45,14 +45,13 @@ public class FinderPath
             {
                 for (int i = 0; i < amountCells; i++)
                 {
-                    if (matrix[minIndex, i] != null)
+                    if (matrix[minIndex, i] > 0)
                     {
-                        var distance = min + matrix[minIndex, i].Value;
+                        var distance = min + matrix[minIndex, i];
                         if (distance < minDistance[i])
                         {
                             minDistance[i] = distance;
                         }
-
                     }
                 }
 
@@ -61,22 +60,27 @@ public class FinderPath
         } while (minIndex < int.MaxValue);
 
         stepsOfPath.Add(selectedCell);        
-        var end = selectedCell - 1;
+        var end = selectedCell;
         var weight = minDistance[selectedCell];
 
         while (end != begin_index)
         {
             for (int i = 0; i < amountCells; i++)
             {
-                if (matrix[i, end] != null)
+                if (matrix[i, end] != 0)
                 {
-                    var temp = weight - matrix[i, end].Value;
+                    var temp = weight - matrix[i, end];
                     if (temp == minDistance[i])
                     {
                         weight = temp;
                         end = i;
-                        stepsOfPath.Add(i + 1);
+                        stepsOfPath.Add(i);
                     }
+                }
+
+                if (stepsOfPath.Count > 1000)
+                {
+                    return new List<int>();
                 }
             }
         }
@@ -88,11 +92,11 @@ public class FinderPath
     {
         for (int i = 0; i < amountCells; i++)
         {
-            matrix[i, i] = null;
+            matrix[i, i] = 0;
             for (int j = i + 1; j < amountCells; j++)
             {
-                matrix[i, j] = null;
-                matrix[j, i] = null;
+                matrix[i, j] = 0;
+                matrix[j, i] = 0;
             }
         }
     }

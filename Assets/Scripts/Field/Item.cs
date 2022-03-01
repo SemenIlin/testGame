@@ -3,7 +3,7 @@ using UnityEngine;
 public class Item 
 {
     private Vector3 _position;
-    private int _id;
+    private readonly int _id;
 
     public Item(Vector3 position, int id) 
     {
